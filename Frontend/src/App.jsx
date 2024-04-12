@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useState } from "react";
+import { TailSpin } from "react-loader-spinner";
 
 const App = () => {
   const [image, setImage] = useState(null);
   const [name, setName] = useState("");
   const [processedImage, setProcessedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const uploadImage = async (e) => {
     setProcessedImage("");
@@ -26,17 +28,20 @@ const App = () => {
   };
 
   const processImage = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(`http://localhost:3000/${name}`);
       console.log(res);
       setProcessedImage(res.data.path);
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen">
+    <div className="h-fit pb-20">
       <div className="flex w-full text-center justify-center ">
         <div className="text-5xl mt-20">Underwater Image Enhancement</div>
       </div>
@@ -57,24 +62,48 @@ const App = () => {
           PROCESS
         </button>
       </div>
-      <div className="flex justify-center my-10 mx-20">
+      <div className="w-[75vw] h-fit bg-[#1e293b] mx-auto rounded-2xl mt-10">
+        <table className="w-full rounded-t-2xl">
+          <thead className="bg-[#293548]">
+            <th className="p-5 rounded-tl-2xl">Original Image</th>
+            <th className="p-5 rounded-tr-2xl">Processed Image</th>
+          </thead>
+          <tbody className="h-full">
+            <tr>
+              <td className="px-4 w-[40em] h-[30em] py-6"> {image && <img className="w-[35em] mx-auto" src={image} alt="uploaded" />}</td>
+              <td className="px-4 w-[40em] h-[30em] py-6">
+                {processedImage ? (
+                  <img className="w-[35em] mx-auto" src={"/processed_image.png"} alt="uploaded" />
+                ) : (
+                  loading && (
+                    <div className="flex justify-center items-center"> 
+                      <TailSpin visible={true} height="60" width="60" color="#0ea5e9" ariaLabel="tail-spin-loading" radius="1" wrapperStyle={{}} wrapperClass="" />
+                    </div>
+                  )
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {/* <div className="flex justify-center my-10 mx-20">
         {image && (
           <div className="bg-[#293548] pt-5 text-center rounded-tl-3xl border-[1px] border-gray-700">
             Original Image
-            <div className="flex w-[40em] mt-3 text-center justify-center p-4 bg-[#1e293b]">
-              <img src={image} alt="uploaded" />
+            <div className="flex mt-3 text-center justify-center p-4 bg-[#1e293b]">
+              <img className="w-1/2" src={image} alt="uploaded" />
             </div>
           </div>
         )}
         {processedImage && (
           <div className="bg-[#293548] pt-5 text-center rounded-tr-3xl border-[1px] border-gray-700">
             Processed Image
-            <div className="flex w-[40em] mt-3 text-center justify-center p-4 bg-[#1e293b]">
-              <img src={"/processed_image.png"} alt="processed" />
+            <div className="flex mt-3 text-center justify-center p-4 bg-[#1e293b]">
+              <img className="w-1/2" src={"/processed_image.png"} alt="processed" />
             </div>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
